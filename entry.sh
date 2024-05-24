@@ -41,8 +41,10 @@ terminate() {
 # Trap SIGTERM and call terminate function
 trap terminate SIGTERM
 
-# Start reload.sh in the background as appuser
-su "$USER_NAME" -c "/bin/sh /usr/local/bin/reload.sh &"
+# Start reload.sh in the background if AUTO_RELOAD_CONFIG is true
+if [ "$AUTO_RELOAD_CONFIG" = "true" ]; then
+    su "$USER_NAME" -c "/bin/sh /usr/local/bin/reload.sh &"
+fi
 
 # Execute /usr/local/bin/clash as appuser
 exec su "$USER_NAME" -c "/usr/local/bin/clash -d /config"

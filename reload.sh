@@ -6,6 +6,47 @@ terminate() {
     exit 0
 }
 
+# Function to modify config.yaml
+modify_config() {
+    config_file="/config/config.yaml"
+
+    # Modify specific lines in config.yaml
+    sed -i 's/socks-port: 7891/socks-port: 7890/' "$config_file"
+    sed -i 's/allow-lan: false/allow-lan: true/' "$config_file"
+    sed -i 's/^.*external-controller.*$/external-controller: 0.0.0.0:9090/' "$config_file"
+
+    # Replace or add external-ui
+    if grep -q 'external-ui:' "$config_file"; then
+        sed -i 's|^.*external-ui.*$|external-ui: /var/app/webui|' "$config_file"
+    else
+        echo 'external-ui: /var/app/webui' >> "$config_file"
+    fi
+
+    if grep -q 'mixed-port:' "$config_file"; then
+        sed -i 's|^.*mixed-port.*$|mixed-port: 7890|' "$config_file"
+    else
+        echo 'mixed-port: 7890' >> "$config_file"
+    fi
+
+    # Add content to the end of config.yaml
+    cat <<EOL >> "$config_file"
+
+experimental:
+  sniff-tls-sni: true
+
+tun:
+  enable: true
+  stack: system
+  dns-hijack:
+    - 8.8.8.8:53
+    - tcp://8.8.8.8:53
+    - any:53
+    - tcp://any:53
+  auto-route: true
+  auto-detect-interface: true
+EOL
+}
+
 # Trap SIGTERM signal
 trap terminate SIGTERM
 
@@ -36,6 +77,9 @@ while true; do
             echo "Failed to download config file: HTTP $http_code"
             continue
         fi
+
+        # Modify the downloaded config.yaml
+        modify_config
 
         # Perform a PUT request to the specified address and capture response and HTTP code
         response=$(curl -sS -m 5 -w "\n%{http_code}\n" -X PUT -H "Content-Type: application/json" \

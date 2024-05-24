@@ -7,6 +7,7 @@ ARG PREMIUM=unsupport
 
 WORKDIR /var/app
 
+COPY webui webui
 COPY Country.mmdb .
 COPY ${ARCH_TYPE}/clash${PREMIUM} /usr/local/bin/clash
 COPY reload.sh /usr/local/bin/reload.sh
