@@ -16,7 +16,8 @@ COPY entry.sh /usr/local/bin/entry.sh
 RUN chmod +x /usr/local/bin/clash \
     /usr/local/bin/reload.sh \
     /usr/local/bin/entry.sh \
-    && apk add --no-cache curl shadow
+    && sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    && apk update && apk add --no-cache curl shadow
 
 EXPOSE 7890 9090
 VOLUME ["/config"]

@@ -26,6 +26,7 @@ fi
 
 # 确保 /config 目录属于 appuser:appgroup
 chown "$USER_NAME:$GROUP_NAME" /config
+chown "$USER_NAME:$GROUP_NAME" -R /var/app
 
 # 复制 Country.mmdb 到 /config
 cp /var/app/Country.mmdb /config

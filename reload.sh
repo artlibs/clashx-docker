@@ -11,29 +11,29 @@ modify_config() {
     config_file="/config/config.yaml"
 
     # Modify specific lines in config.yaml
-    sed -i 's/socks-port: 7891/socks-port: 7890/' "$config_file"
-    sed -i 's/allow-lan: false/allow-lan: true/' "$config_file"
-    sed -i 's/^.*external-controller.*$/external-controller: 0.0.0.0:9090/' "$config_file"
-
-    # Replace or add external-ui
-    if grep -q 'external-ui:' "$config_file"; then
-        sed -i 's|^.*external-ui.*$|external-ui: /var/app/webui|' "$config_file"
-    else
-        echo 'external-ui: /var/app/webui' >> "$config_file"
-    fi
-
-    if grep -q 'mixed-port:' "$config_file"; then
-        sed -i 's|^.*mixed-port.*$|mixed-port: 7890|' "$config_file"
-    else
-        echo 'mixed-port: 7890' >> "$config_file"
-    fi
+    sed -i '/^mode:/d' "$config_file"
+    sed -i '/^allow-lan:/d' "$config_file"
+    sed -i '/^socks-port:/d' "$config_file"
+    sed -i '/^mixed-port:/d' "$config_file"
+    sed -i '/^log-level:/d' "$config_file"
+    sed -i '/^external-ui:/d' "$config_file"
+    sed -i '/^external-controller:/d' "$config_file"
+    sed -i '/^  sniff-tls-sni:/d' "$config_file"
+    sed -i '/^experimental:/d' "$config_file"
+    sed -i '/^tun:$/,+9d' "$config_file"
+    sed -i -e 's/^port: 789*$/port: 7890/' \
+           -e '/^port: 7890$/a mode: Rule' \
+           -e '/^port: 7890$/a socks-port: 7890' \
+           -e '/^port: 7890$/a mixed-port: 7890' \
+           -e '/^port: 7890$/a allow-lan: true' \
+           -e '/^port: 7890$/a log-level: warning' \
+           -e '/^port: 7890$/a external-ui: /var/app/webui' \
+           -e '/^port: 7890$/a external-controller: 0.0.0.0:9090' \
+           -e '/^port: 7890$/a experimental:\n  sniff-tls-sni: true' "$config_file"
+    sed -i 's/rules:/rules:\n  - DOMAIN-SUFFIX,httpbin.org,DIRECT/' "$config_file"
 
     # Add content to the end of config.yaml
     cat <<EOL >> "$config_file"
-
-experimental:
-  sniff-tls-sni: true
-
 tun:
   enable: true
   stack: system
