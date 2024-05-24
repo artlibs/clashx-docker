@@ -12,6 +12,7 @@ modify_config() {
 
     # Modify specific lines in config.yaml
     sed -i '/^mode:/d' "$config_file"
+    sed -i '/^secret:/d' "$config_file"
     sed -i '/^port: 789.*/d' "$config_file"
     sed -i '/^allow-lan:/d' "$config_file"
     sed -i '/^socks-port:/d' "$config_file"
@@ -34,6 +35,12 @@ external-controller: 0.0.0.0:9090
 experimental:
   sniff-tls-sni: true
 EOL
+    if [ -n "$PROXY_SECRET" ]; then
+        echo "secret: \"$PROXY_SECRET\"" >> "$config_file"
+    else
+        echo 'secret: ""' >> "$config_file"
+    fi
+
     # Add content to the end of config.yaml
     if [ "$TUN_ENABLE" = "true" ]; then
         cat <<EOL >> "$config_file"
@@ -87,6 +94,7 @@ while true; do
 
         # Perform a PUT request to the specified address and capture response and HTTP code
         response=$(curl -sS -m 5 -w "\n%{http_code}\n" -X PUT -H "Content-Type: application/json" \
+	    -H "Authorization: Bearer $PROXY_SECRET" \
             -d '{"path": "/config/config.yaml"}' \
             http://127.0.0.1:9090/configs)
         

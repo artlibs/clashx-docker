@@ -33,6 +33,7 @@ services:
       - PUID=1000  # user
       - PGID=100  # group
       - UMASK=022
+    # - PROXY_SECRET=your secret
       - AUTO_RELOAD_CONFIG=true
       - REFRESH_CONFIG_INTERVAL=15
     restart: unless-stopped

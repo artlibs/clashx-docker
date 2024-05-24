@@ -2,7 +2,7 @@
 
 ARCH=$(arch)
 
-if [ "$ARCH" = "i386" ] || [ "$ARCH" = "x86" ]; then
+if [ "$ARCH" = "i386" ] || [ "$ARCH" = "x86_64" ]; then
     ARCH_VALUE="amd64"
 elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "armv8" ]; then
     ARCH_VALUE="arm64"
