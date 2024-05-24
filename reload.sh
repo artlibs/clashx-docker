@@ -12,6 +12,7 @@ modify_config() {
 
     # Modify specific lines in config.yaml
     sed -i '/^mode:/d' "$config_file"
+    sed -i '/^port: 789.*/d' "$config_file"
     sed -i '/^allow-lan:/d' "$config_file"
     sed -i '/^socks-port:/d' "$config_file"
     sed -i '/^mixed-port:/d' "$config_file"
@@ -21,19 +22,21 @@ modify_config() {
     sed -i '/^  sniff-tls-sni:/d' "$config_file"
     sed -i '/^experimental:/d' "$config_file"
     sed -i '/^tun:$/,+9d' "$config_file"
-    sed -i -e 's/^port: 789*$/port: 7890/' \
-           -e '/^port: 7890$/a mode: Rule' \
-           -e '/^port: 7890$/a socks-port: 7890' \
-           -e '/^port: 7890$/a mixed-port: 7890' \
-           -e '/^port: 7890$/a allow-lan: true' \
-           -e '/^port: 7890$/a log-level: warning' \
-           -e '/^port: 7890$/a external-ui: /var/app/webui' \
-           -e '/^port: 7890$/a external-controller: 0.0.0.0:9090' \
-           -e '/^port: 7890$/a experimental:\n  sniff-tls-sni: true' "$config_file"
-    sed -i 's/rules:/rules:\n  - DOMAIN-SUFFIX,httpbin.org,DIRECT/' "$config_file"
-
-    # Add content to the end of config.yaml
+    sed -i '/^  - DOMAIN-SUFFIX,httpbin.org,DIRECT$/d' "$config_file"
+    sed -i 's/^rules:$/rules:\n  - DOMAIN-SUFFIX,httpbin.org,DIRECT/' "$config_file"
     cat <<EOL >> "$config_file"
+mode: Rule
+mixed-port: 7890
+allow-lan: true
+log-level: warning
+external-ui: /var/app/webui
+external-controller: 0.0.0.0:9090
+experimental:
+  sniff-tls-sni: true
+EOL
+    # Add content to the end of config.yaml
+    if [ "$TUN_ENABLE" = "true" ]; then
+        cat <<EOL >> "$config_file"
 tun:
   enable: true
   stack: system
@@ -45,6 +48,7 @@ tun:
   auto-route: true
   auto-detect-interface: true
 EOL
+    fi
 }
 
 # Trap SIGTERM signal
