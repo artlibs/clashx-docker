@@ -1,7 +1,10 @@
 ## clashx
 
-```shell
-$ docker run -p 7890:7890 -p 9090:9090 -v ./config:/config i36lib/clashx:latest
+See `https://hub.docker.com/repository/docker/i36lib/clashx/tags`
 
-$ ./reload.sh config http://127.0.0.1:9090
+Put your clash subscription url in the `/your-path/clash/config/rss_url` file
+
+```shell
+$ docker run -v /<your-path>/clash/config:/config i36lib/clashx:<platform>-latest --net=host
+$ docker run -v /<your-path>/clash/config:/config i36lib/clashx:premium-<platform>-latest --net=host
 ```
